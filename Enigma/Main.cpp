@@ -1,5 +1,4 @@
 #include "Enigma.h"
-
 using namespace std;
 
 void fillOutVector(vector<char> &v)
@@ -7,6 +6,7 @@ void fillOutVector(vector<char> &v)
 	for (char c = 'a'; c <= 'z'; c++)
 		v.push_back(c);
 }
+
 
 void printVector(vector<char> &v)
 {
@@ -18,9 +18,6 @@ void printVector(vector<char> &v)
 int main()
 {
 	Enigma e('a', 'z');
-	std::string s = e.ToStringAlphabet();
-	cout << "Alphabet: " << s << endl;
-	s = e.ToStringRotor();
-	cout << s << endl;
+	cout << "Alphabet: " << e.GetAlphabet() << endl;
 	return 0;
 }
