@@ -18,7 +18,7 @@ char key[] = "ABC";
 long mod26(long a)
 {
 	int re = (a + 26) % 26;
-	cout << "Mod26 of ("<< a <<"): " << re << endl;
+	//cout << "Mod26 of ("<< a <<"): " << re << endl;
 	return re;
 }
 
@@ -75,7 +75,11 @@ string crypt(const char *input)
 
 //int main()
 //{
-//	string s = crypt("HELLO");
-//	cout << s << endl;
+//	string s = "HELLO";
+//	string out;
+//	out = crypt(s.c_str());
+//	cout << s << " becomes " << out << endl;
+//	s = crypt(out.c_str());
+//	cout << out << " becomes " << s << endl;
 //	return 0;
 //}
