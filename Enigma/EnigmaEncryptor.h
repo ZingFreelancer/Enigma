@@ -3,12 +3,12 @@
 #include <string>
 #include <algorithm>
 
-class Enigma
+class EnigmaEncryptor
 {
 public:
 	//Empty/Default constructor 
-	Enigma();
-	virtual ~Enigma();
+	EnigmaEncryptor();
+	virtual ~EnigmaEncryptor();
 private: 
 	//Variables
 	int m_random_seed;
@@ -19,7 +19,7 @@ private:
 	std::vector<std::string> m_rotors;
 
 private: //Functions
-	uint8_t char_index(char c) const;
+	int8_t char_index(char c) const;
 	uint8_t mod_to_alphabet(int val) const;
 	void incrementRotors();
 
@@ -30,6 +30,9 @@ public: //Functions
 	void SetRotorKey(const std::string key)
 	{
 		m_rotor_key = key;
+		for (size_t i = 0; i < key.length(); i++)
+			m_rotor_key[i] = m_alphabet[mod_to_alphabet(char_index(key[i]))];
+
 	}
 
 	const std::string& GetAlphabet() const

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "EnigmaEncryptor.h"
 
 namespace Enigma {
 
@@ -15,7 +16,7 @@ namespace Enigma {
 	public ref class MainWindow : public System::Windows::Forms::Form
 	{
 	public:
-		MainWindow(void)
+		MainWindow(void) : enigma{new EnigmaEncryptor()}, can_update_key_input{false}
 		{
 			InitializeComponent();
 			//
@@ -33,20 +34,17 @@ namespace Enigma {
 			{
 				delete components;
 			}
+			delete enigma;
 		}
 	private: System::Windows::Forms::Label^  lbl_alphabet;
 	private: System::Windows::Forms::TextBox^  txt_alphabet;
 	private: System::Windows::Forms::TextBox^  txt_LR_key;
-
 	private: System::Windows::Forms::Button^  btn_LR_up;
 	private: System::Windows::Forms::Button^  btn_LR_down;
-
-
-
 	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel4;
 	private: System::Windows::Forms::Button^  btn_MR_up;
 	private: System::Windows::Forms::TextBox^  txt_MR_key;
-	private: System::Windows::Forms::Button^  btn_MR_key;
+	private: System::Windows::Forms::Button^  btn_MR_down;
 	private: System::Windows::Forms::Button^  btn_RR_up;
 	private: System::Windows::Forms::TextBox^  txt_RR_key;
 	private: System::Windows::Forms::Button^  btn_RR_down;
@@ -54,30 +52,15 @@ namespace Enigma {
 	private: System::Windows::Forms::TextBox^  txt_input;
 	private: System::Windows::Forms::TextBox^  txt_output;
 	private: System::Windows::Forms::Label^  lbl_input_text;
-
 	private: System::Windows::Forms::Label^  lbl_output_text;
 	private: System::Windows::Forms::Button^  btn_encrypt;
-
-
-
-
-
-
-
-
-
-
-	protected:
-
-	protected:
-
 
 	private:
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
 		System::ComponentModel::Container ^components;
-
+		EnigmaEncryptor *enigma;
 #pragma region Windows Form Designer generated code
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -91,12 +74,12 @@ namespace Enigma {
 			this->btn_LR_up = (gcnew System::Windows::Forms::Button());
 			this->btn_LR_down = (gcnew System::Windows::Forms::Button());
 			this->flowLayoutPanel4 = (gcnew System::Windows::Forms::FlowLayoutPanel());
-			this->btn_MR_key = (gcnew System::Windows::Forms::Button());
 			this->btn_MR_up = (gcnew System::Windows::Forms::Button());
 			this->txt_MR_key = (gcnew System::Windows::Forms::TextBox());
-			this->btn_RR_down = (gcnew System::Windows::Forms::Button());
-			this->txt_RR_key = (gcnew System::Windows::Forms::TextBox());
+			this->btn_MR_down = (gcnew System::Windows::Forms::Button());
 			this->btn_RR_up = (gcnew System::Windows::Forms::Button());
+			this->txt_RR_key = (gcnew System::Windows::Forms::TextBox());
+			this->btn_RR_down = (gcnew System::Windows::Forms::Button());
 			this->lbl_rotor_key = (gcnew System::Windows::Forms::Label());
 			this->txt_input = (gcnew System::Windows::Forms::TextBox());
 			this->txt_output = (gcnew System::Windows::Forms::TextBox());
@@ -136,6 +119,7 @@ namespace Enigma {
 			this->txt_LR_key->TabIndex = 2;
 			this->txt_LR_key->Text = L"A";
 			this->txt_LR_key->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			this->txt_LR_key->TextChanged += gcnew System::EventHandler(this, &MainWindow::on_key_input);
 			// 
 			// btn_LR_up
 			// 
@@ -147,6 +131,7 @@ namespace Enigma {
 			this->btn_LR_up->TabIndex = 3;
 			this->btn_LR_up->Text = L"";
 			this->btn_LR_up->UseVisualStyleBackColor = true;
+			this->btn_LR_up->Click += gcnew System::EventHandler(this, &MainWindow::on_rotor_value_change_Click);
 			// 
 			// btn_LR_down
 			// 
@@ -158,6 +143,7 @@ namespace Enigma {
 			this->btn_LR_down->TabIndex = 3;
 			this->btn_LR_down->Text = L"";
 			this->btn_LR_down->UseVisualStyleBackColor = true;
+			this->btn_LR_down->Click += gcnew System::EventHandler(this, &MainWindow::on_rotor_value_change_Click);
 			// 
 			// flowLayoutPanel4
 			// 
@@ -166,7 +152,7 @@ namespace Enigma {
 			this->flowLayoutPanel4->Controls->Add(this->btn_LR_down);
 			this->flowLayoutPanel4->Controls->Add(this->btn_MR_up);
 			this->flowLayoutPanel4->Controls->Add(this->txt_MR_key);
-			this->flowLayoutPanel4->Controls->Add(this->btn_MR_key);
+			this->flowLayoutPanel4->Controls->Add(this->btn_MR_down);
 			this->flowLayoutPanel4->Controls->Add(this->btn_RR_up);
 			this->flowLayoutPanel4->Controls->Add(this->txt_RR_key);
 			this->flowLayoutPanel4->Controls->Add(this->btn_RR_down);
@@ -175,17 +161,6 @@ namespace Enigma {
 			this->flowLayoutPanel4->Name = L"flowLayoutPanel4";
 			this->flowLayoutPanel4->Size = System::Drawing::Size(109, 97);
 			this->flowLayoutPanel4->TabIndex = 5;
-			// 
-			// btn_MR_key
-			// 
-			this->btn_MR_key->Font = (gcnew System::Drawing::Font(L"Wingdings", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(2)));
-			this->btn_MR_key->Location = System::Drawing::Point(39, 67);
-			this->btn_MR_key->Name = L"btn_MR_key";
-			this->btn_MR_key->Size = System::Drawing::Size(30, 26);
-			this->btn_MR_key->TabIndex = 3;
-			this->btn_MR_key->Text = L"";
-			this->btn_MR_key->UseVisualStyleBackColor = true;
 			// 
 			// btn_MR_up
 			// 
@@ -197,6 +172,7 @@ namespace Enigma {
 			this->btn_MR_up->TabIndex = 3;
 			this->btn_MR_up->Text = L"";
 			this->btn_MR_up->UseVisualStyleBackColor = true;
+			this->btn_MR_up->Click += gcnew System::EventHandler(this, &MainWindow::on_rotor_value_change_Click);
 			// 
 			// txt_MR_key
 			// 
@@ -208,28 +184,19 @@ namespace Enigma {
 			this->txt_MR_key->TabIndex = 2;
 			this->txt_MR_key->Text = L"A";
 			this->txt_MR_key->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			this->txt_MR_key->TextChanged += gcnew System::EventHandler(this, &MainWindow::on_key_input);
 			// 
-			// btn_RR_down
+			// btn_MR_down
 			// 
-			this->btn_RR_down->Font = (gcnew System::Drawing::Font(L"Wingdings", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->btn_MR_down->Font = (gcnew System::Drawing::Font(L"Wingdings", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(2)));
-			this->btn_RR_down->Location = System::Drawing::Point(75, 67);
-			this->btn_RR_down->Name = L"btn_RR_down";
-			this->btn_RR_down->Size = System::Drawing::Size(30, 26);
-			this->btn_RR_down->TabIndex = 3;
-			this->btn_RR_down->Text = L"";
-			this->btn_RR_down->UseVisualStyleBackColor = true;
-			// 
-			// txt_RR_key
-			// 
-			this->txt_RR_key->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(0)));
-			this->txt_RR_key->Location = System::Drawing::Point(75, 35);
-			this->txt_RR_key->Name = L"txt_RR_key";
-			this->txt_RR_key->Size = System::Drawing::Size(30, 26);
-			this->txt_RR_key->TabIndex = 2;
-			this->txt_RR_key->Text = L"A";
-			this->txt_RR_key->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			this->btn_MR_down->Location = System::Drawing::Point(39, 67);
+			this->btn_MR_down->Name = L"btn_MR_down";
+			this->btn_MR_down->Size = System::Drawing::Size(30, 26);
+			this->btn_MR_down->TabIndex = 3;
+			this->btn_MR_down->Text = L"";
+			this->btn_MR_down->UseVisualStyleBackColor = true;
+			this->btn_MR_down->Click += gcnew System::EventHandler(this, &MainWindow::on_rotor_value_change_Click);
 			// 
 			// btn_RR_up
 			// 
@@ -241,6 +208,31 @@ namespace Enigma {
 			this->btn_RR_up->TabIndex = 3;
 			this->btn_RR_up->Text = L"";
 			this->btn_RR_up->UseVisualStyleBackColor = true;
+			this->btn_RR_up->Click += gcnew System::EventHandler(this, &MainWindow::on_rotor_value_change_Click);
+			// 
+			// txt_RR_key
+			// 
+			this->txt_RR_key->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->txt_RR_key->Location = System::Drawing::Point(75, 35);
+			this->txt_RR_key->Name = L"txt_RR_key";
+			this->txt_RR_key->Size = System::Drawing::Size(30, 26);
+			this->txt_RR_key->TabIndex = 2;
+			this->txt_RR_key->Text = L"A";
+			this->txt_RR_key->TextAlign = System::Windows::Forms::HorizontalAlignment::Center;
+			this->txt_RR_key->TextChanged += gcnew System::EventHandler(this, &MainWindow::on_key_input);
+			// 
+			// btn_RR_down
+			// 
+			this->btn_RR_down->Font = (gcnew System::Drawing::Font(L"Wingdings", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(2)));
+			this->btn_RR_down->Location = System::Drawing::Point(75, 67);
+			this->btn_RR_down->Name = L"btn_RR_down";
+			this->btn_RR_down->Size = System::Drawing::Size(30, 26);
+			this->btn_RR_down->TabIndex = 3;
+			this->btn_RR_down->Text = L"";
+			this->btn_RR_down->UseVisualStyleBackColor = true;
+			this->btn_RR_down->Click += gcnew System::EventHandler(this, &MainWindow::on_rotor_value_change_Click);
 			// 
 			// lbl_rotor_key
 			// 
@@ -306,6 +298,7 @@ namespace Enigma {
 			this->btn_encrypt->TabIndex = 10;
 			this->btn_encrypt->Text = L"Convert";
 			this->btn_encrypt->UseVisualStyleBackColor = true;
+			this->btn_encrypt->Click += gcnew System::EventHandler(this, &MainWindow::btn_encrypt_Click);
 			// 
 			// MainWindow
 			// 
@@ -323,6 +316,7 @@ namespace Enigma {
 			this->Controls->Add(this->lbl_alphabet);
 			this->Name = L"MainWindow";
 			this->Text = L"MainWindow";
+			this->Load += gcnew System::EventHandler(this, &MainWindow::on_main_window_Load);
 			this->flowLayoutPanel4->ResumeLayout(false);
 			this->flowLayoutPanel4->PerformLayout();
 			this->ResumeLayout(false);
@@ -330,5 +324,16 @@ namespace Enigma {
 
 		}
 #pragma endregion
-	};
+	//variables
+	private:
+		bool can_update_key_input;
+		System::String^ display_key;
+	private: 
+		void update_rotor_display();
+		System::Void on_main_window_Load(System::Object^  sender, System::EventArgs^  e);
+		System::Void btn_encrypt_Click(System::Object^  sender, System::EventArgs^  e);
+		System::Void on_rotor_value_change_Click(System::Object^  sender, System::EventArgs^  e);
+		System::Void on_key_input(System::Object^  sender, System::EventArgs^  e);
+		void update_enigma_key();
+};
 }

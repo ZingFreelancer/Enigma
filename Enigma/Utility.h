@@ -1,13 +1,27 @@
-//#pragma once
-//#include <vector>
-//using namespace std;
-//
-//// explicit_specialization.cpp  
-//template <typename T>
-//static string VectorToString(vector<T> v)
-//{
-//	std::string out;
-//	for (auto i = v.begin(); i != v.end(); i++)
-//		out += itr;
-//	return out;
-//};
+#pragma once
+namespace Utility_Private
+{
+	using namespace std;
+	using namespace System;
+	using namespace System::Runtime::InteropServices;
+
+
+	static void ToSTDString(System::String ^ s, std::string & os)
+	{
+		const char* chars =
+			(const char*)(Marshal::StringToHGlobalAnsi(s)).ToPointer();
+		os = chars;
+		Marshal::FreeHGlobal(IntPtr((void*)chars));
+	}
+}
+
+namespace Utility
+{
+#include <string>
+	static std::string StringToString(System::String ^ s)
+	{
+		std::string re;
+		Utility_Private::ToSTDString(s, re);
+		return re;
+	}
+}
